@@ -4,14 +4,16 @@ class ReWrapCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         region_set = self.view.sel()[0]
         region_text = self.view.substr(region_set )
+        region_text_list = re.split("\n{2,}", region_text)
         settings = sublime.load_settings('ReWrap.sublime-settings')
         width = settings.get("width", 120)
-        region_text = re_format(region_text, width)
-        self.view.replace(edit, region_set, region_text)
+        region_text_reformat = [reformat(region_text, width) for region_text in region_text_list]
+        region_text_reformat = "\n".join(region_text_reformat)
+        self.view.replace(edit, region_set, region_text_reformat)
 
 
 # a string or a list of string? see sumblime text api
-def re_format(s, width):
+def reformat(s, width):
     s = re.sub("\n+", " ", s)
     s = re.sub("\s+", " ", s)
     s = s.split()
